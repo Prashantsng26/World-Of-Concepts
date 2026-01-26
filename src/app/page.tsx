@@ -69,7 +69,7 @@ export default function Home() {
     // Delay navigation to let the user hear the initial boom and see the rocket
     setTimeout(() => {
       router.push(`/explorer?q=${encodeURIComponent(query)}&mode=${mode}`);
-    }, 2000);
+    }, 2200);
   };
 
   return (

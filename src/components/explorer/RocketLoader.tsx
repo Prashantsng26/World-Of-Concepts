@@ -20,7 +20,7 @@ export function RocketLoader({ mini = false }: { mini?: boolean }) {
         audio.play().catch(() => { });
         audioRef.current = audio;
 
-        const duration = 2500;
+        const duration = 2200; // Slightly faster total duration
         const start = Date.now();
         const interval = setInterval(() => {
             const elapsed = Date.now() - start;
@@ -140,7 +140,7 @@ export function RocketLoader({ mini = false }: { mini?: boolean }) {
 
             {/* SPACE STREAKS */}
             <div className="absolute inset-0 z-10">
-                {launchProgress > 0.6 && Array.from({ length: 60 }).map((_, i) => (
+                {launchProgress > 0.4 && Array.from({ length: 60 }).map((_, i) => (
                     <div
                         key={i}
                         className="star-streak absolute w-[1px] h-32 bg-sky-400/30 rounded-full"
@@ -148,7 +148,7 @@ export function RocketLoader({ mini = false }: { mini?: boolean }) {
                             left: `${Math.random() * 100}%`,
                             top: `-10vh`,
                             // @ts-ignore
-                            "--duration": `${0.2 + Math.random() * 0.3}s`,
+                            "--duration": `${0.15 + Math.random() * 0.2}s`, // Faster streaks
                             "--delay": `${Math.random()}s`
                         }}
                     />
@@ -163,9 +163,20 @@ export function RocketLoader({ mini = false }: { mini?: boolean }) {
             {/* THE ROCKET */}
             <motion.div
                 className="relative z-50 flex flex-col items-center"
-                initial={{ y: "20vh" }}
-                animate={launchProgress < 0.2 ? { y: ["20vh", "19.8vh", "20vh"] } : { y: "-150vh", scale: 0.5, rotate: 0 }}
-                transition={launchProgress < 0.2 ? { duration: 0.05, repeat: Infinity } : { duration: 1.8, ease: "easeIn" }}
+                initial={{ y: "20vh", scale: 1 }}
+                animate={
+                    launchProgress < 0.15
+                        ? { y: ["20vh", "19.8vh", "20.2vh", "20vh"], rotate: [0, -0.5, 0.5, 0] } // Heavy shake
+                        : {
+                            y: "-200vh", // Further into space
+                            scale: [1, 0.8, 0.3], // Zoom away
+                            opacity: [1, 1, 0], // Fade out at peak
+                            transition: {
+                                duration: 1.5,
+                                ease: [0.45, 0, 0.55, 1], // Custom power curve
+                            }
+                        }
+                }
             >
                 <div className="relative">
                     <svg width="80" height="130" viewBox="0 0 60 100" fill="none" className="drop-shadow-[0_0_40px_rgba(56,189,248,0.4)]">
