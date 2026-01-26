@@ -1,0 +1,90 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String     @id @default(cuid())
+  name          String?
+  email         String     @unique
+  passwordHash  String
+  createdAt     DateTime   @default(now())
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  topics        Topic[]
+  bookmarks     Bookmark[]
+}
+
+model Topic {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  query     String
+  slug      String   @unique
+  mode      String   // SHORT, BRIEF, DETAILED
+  status    String   @default("PENDING") // PENDING, GENERATING, COMPLETED, FAILED
+  createdAt DateTime @default(now())
+  nodes     Node[]
+  shares    Share[]
+}
+
+model Node {
+  id         String       @id @default(cuid())
+  topicId    String
+  topic      Topic        @relation(fields: [topicId], references: [id])
+  parentId   String?
+  parent     Node?        @relation("NodeToNode", fields: [parentId], references: [id])
+  children   Node[]       @relation("NodeToNode")
+  title      String
+  depth      Int
+  orderIndex Int
+  createdAt  DateTime     @default(now())
+  contents   NodeContent[]
+  bookmarks  Bookmark[]
+}
+
+model NodeContent {
+  id             String   @id @default(cuid())
+  nodeId         String
+  node           Node     @relation(fields: [nodeId], references: [id])
+  mode           String   // SHORT, BRIEF, DETAILED
+  summary        String
+  contentMd      String?
+  imagePrompt    String?  // Prompt for AI image generation
+  flowchart      String?  // JSON string for flowchart data
+
+  // Store arrays/objects as JSON strings for SQLite compatibility
+  keyPoints      String   // JSON string (array)
+  examples       String   // JSON string (array/object)
+  misconceptions String?  // JSON string
+  faq            String?  // JSON string
+  nextConcepts   String?  // JSON string
+  visualGrid     String?  // JSON string (array of {title, description, imagePrompt})
+  quizData       String?  // JSON string (array of {question, options, answerIndex, explanation})
+
+  createdAt      DateTime @default(now())
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  nodeId    String
+  node      Node     @relation(fields: [nodeId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, nodeId])
+}
+
+model Share {
+  id        String   @id @default(cuid())
+  topicId   String
+  topic     Topic    @relation(fields: [topicId], references: [id])
+  shareId   String   @unique
+  isPublic  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
