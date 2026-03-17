@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     Bookmark, Share2, Clock, Workflow,
-    ArrowRight, Zap, Target, Orbit, Image as ImageIcon,
+    ArrowRight, Zap, Target, Orbit,
     Activity
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -51,7 +51,6 @@ export function NodeContent({
     const [quizIndex, setQuizIndex] = useState(0);
     const [selectedOption, setSelectedOption] = useState<number | null>(null);
     const [isAnswered, setIsAnswered] = useState(false);
-    const [imageLoaded, setImageLoaded] = useState(false);
     const [activeFlowStep, setActiveFlowStep] = useState(0);
 
     const quiz = content.quizData || [];
@@ -129,8 +128,7 @@ export function NodeContent({
                     </p>
                 </header>
 
-                <div className="grid lg:grid-cols-12 gap-12">
-                    <div className="lg:col-span-8 space-y-16">
+                    <div className="space-y-16">
                         {/* INTEL FEED */}
                         <section className="space-y-8">
                             <div className="flex items-center gap-3">
@@ -221,41 +219,6 @@ export function NodeContent({
                         )}
                     </div>
 
-                    {/* SIDEBAR IMAGE */}
-                    <div className="lg:col-span-4 space-y-6">
-                        {content.imagePrompt ? (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="relative rounded-[2rem] overflow-hidden border border-white/10 bg-white/[0.02] aspect-[3/4] group"
-                            >
-                                <img
-                                    src={`https://image.pollinations.ai/prompt/${encodeURIComponent(content.imagePrompt)}?width=600&height=800&nologo=true&seed=${node.id}`}
-                                    alt={node.title}
-                                    className={cn(
-                                        "w-full h-full object-cover grayscale-[0.4] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000",
-                                        !imageLoaded && "opacity-0"
-                                    )}
-                                    onLoad={() => setImageLoaded(true)}
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                                <div className="absolute bottom-5 left-5 right-5">
-                                    <div className="flex items-center gap-2 text-primary/60 mb-1">
-                                        <ImageIcon className="w-3 h-3" />
-                                        <span className="text-[8px] font-black uppercase tracking-widest">Visual Recon</span>
-                                    </div>
-                                    <p className="text-[10px] text-white/30 leading-relaxed italic line-clamp-2">
-                                        {content.imagePrompt}
-                                    </p>
-                                </div>
-                            </motion.div>
-                        ) : (
-                            <div className="aspect-[3/4] rounded-[2rem] bg-white/[0.01] border border-white/5 border-dashed flex items-center justify-center">
-                                <span className="text-[10px] font-black text-white/5 uppercase tracking-widest">Offline_Link</span>
-                            </div>
-                        )}
-                    </div>
-                </div>
 
                 {/* Quiz */}
                 {quiz.length > 0 && (

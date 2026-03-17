@@ -176,13 +176,7 @@ export default function Home() {
           />
         </motion.div>
 
-        <motion.div
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[20%] right-[15%] glass px-3 py-2 rounded-2xl border border-white/40 shadow-xl pointer-events-none"
-        >
-          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Active Link</p>
-        </motion.div>
+
 
         <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-white to-transparent z-20" />
       </section>
