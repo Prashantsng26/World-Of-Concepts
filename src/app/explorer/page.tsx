@@ -105,7 +105,10 @@ function ExplorerContent() {
             });
             return res.json();
         },
-        onSuccess: () => toast.success("Node anchored to your neural map."),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
+            toast.success("Node anchored to your neural map.");
+        },
     });
 
     // Set initial selected node

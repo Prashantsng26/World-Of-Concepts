@@ -37,11 +37,15 @@ export async function GET(req: Request) {
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user) {
+            console.log("[Bookmarks API] No session found");
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        const userId = (session.user as any).id as string;
+        console.log("[Bookmarks API] Fetching bookmarks for user:", userId);
+
         const bookmarks = await prisma.bookmark.findMany({
-            where: { userId: (session.user as any).id as string },
+            where: { userId },
             include: {
                 node: {
                     include: {
@@ -53,11 +57,13 @@ export async function GET(req: Request) {
             orderBy: { createdAt: "desc" },
         });
 
+        console.log(`[Bookmarks API] Found ${bookmarks.length} bookmarks`);
+
         const parsedBookmarks = bookmarks.map((b: any) => ({
             ...b,
             node: {
                 ...b.node,
-                contents: b.node.contents.map((c: any) => ({
+                contents: (b.node.contents || []).map((c: any) => ({
                     ...c,
                     imagePrompt: c.imagePrompt,
                     flowchart: parseJson(c.flowchart, []),
@@ -72,6 +78,7 @@ export async function GET(req: Request) {
 
         return NextResponse.json(parsedBookmarks);
     } catch (error: any) {
+        console.error("[Bookmarks API Error]:", error);
         return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
     }
 }

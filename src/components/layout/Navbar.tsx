@@ -11,7 +11,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Book, LayoutDashboard, Bookmark, LogOut, Search } from "lucide-react";
+import { Logo } from "./Logo";
+import { LayoutDashboard, Bookmark, LogOut, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Navbar({ isLight = false }: { isLight?: boolean }) {
@@ -26,9 +27,7 @@ export function Navbar({ isLight = false }: { isLight?: boolean }) {
         )}>
             <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-2 group">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 group-hover:border-primary transition-colors">
-                        <Book className="w-5 h-5 text-primary" />
-                    </div>
+                    <Logo isLight={isLight} />
                     <span className={cn(
                         "text-xl font-serif font-bold tracking-wider transition-colors",
                         isLight ? "text-slate-900" : "text-white"

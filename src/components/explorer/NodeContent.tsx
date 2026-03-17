@@ -17,6 +17,8 @@ interface NodeContentProps {
     onExpand: (id: string) => void;
     isExpanding: boolean;
     onBookmark: (id: string) => void;
+    onRefresh: (id: string) => void;
+    isRefreshing: boolean;
 }
 
 const MicroThrust = () => (
@@ -44,6 +46,8 @@ export function NodeContent({
     onExpand,
     isExpanding,
     onBookmark,
+    onRefresh,
+    isRefreshing,
 }: NodeContentProps) {
     const content = node.contents?.[0] || {};
     const readingTime = mode === "SHORT" ? "1 min" : mode === "BRIEF" ? "3 min" : "10 min";
@@ -128,96 +132,96 @@ export function NodeContent({
                     </p>
                 </header>
 
-                    <div className="space-y-16">
-                        {/* INTEL FEED */}
+                <div className="space-y-16">
+                    {/* INTEL FEED */}
+                    <section className="space-y-8">
+                        <div className="flex items-center gap-3">
+                            <Target className="w-4 h-4 text-primary/40" />
+                            <span className="font-black text-[9px] uppercase tracking-[0.4em] text-white/10">Extraction Points</span>
+                        </div>
+
+                        <div className="space-y-6">
+                            {summaryPoints.map((point: string, i: number) => (
+                                <motion.div
+                                    key={i}
+                                    className="flex gap-6 group"
+                                >
+                                    <span className="text-[10px] font-mono text-primary/30 py-1">0{i + 1}</span>
+                                    <p className="text-lg md:text-xl font-light leading-relaxed text-white/40 group-hover:text-white transition-colors">
+                                        {point}
+                                    </p>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* COMPACT INTERACTIVE FLOWCHART */}
+                    {flowchart.length > 0 && (
                         <section className="space-y-8">
-                            <div className="flex items-center gap-3">
-                                <Target className="w-4 h-4 text-primary/40" />
-                                <span className="font-black text-[9px] uppercase tracking-[0.4em] text-white/10">Extraction Points</span>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <Workflow className="w-3.5 h-3.5 text-green-400/40" />
+                                    <span className="font-black text-[9px] uppercase tracking-[0.4em] text-white/10">Sequential Delta</span>
+                                </div>
                             </div>
 
-                            <div className="space-y-6">
-                                {summaryPoints.map((point: string, i: number) => (
+                            <div className="relative space-y-4">
+                                {/* Small Connector Line */}
+                                <div className="absolute left-[21px] top-6 bottom-6 w-px bg-gradient-to-b from-primary/30 via-white/5 to-transparent z-0" />
+
+                                {flowchart.map((step: any, i: number) => (
                                     <motion.div
                                         key={i}
-                                        className="flex gap-6 group"
+                                        onClick={() => setActiveFlowStep(i)}
+                                        className={cn(
+                                            "relative flex gap-6 items-start cursor-pointer group p-4 rounded-[1.5rem] transition-all",
+                                            activeFlowStep === i
+                                                ? "bg-white/[0.02] border border-white/5 shadow-md"
+                                                : "bg-transparent border border-transparent hover:bg-white/[0.01]"
+                                        )}
                                     >
-                                        <span className="text-[10px] font-mono text-primary/30 py-1">0{i + 1}</span>
-                                        <p className="text-lg md:text-xl font-light leading-relaxed text-white/40 group-hover:text-white transition-colors">
-                                            {point}
-                                        </p>
+                                        <div className="relative z-10">
+                                            <div className={cn(
+                                                "w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-300",
+                                                activeFlowStep === i
+                                                    ? "bg-primary/20 border-primary shadow-[0_0_10px_rgba(34,211,238,0.3)]"
+                                                    : "bg-black border-white/5 group-hover:border-white/20"
+                                            )}>
+                                                <span className={cn(
+                                                    "text-[9px] font-black font-mono",
+                                                    activeFlowStep === i ? "text-primary" : "text-white/20"
+                                                )}>
+                                                    {String(i + 1).padStart(2, '0')}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-col gap-1 pt-0.5">
+                                            <h4 className={cn(
+                                                "text-lg font-bold tracking-tight transition-colors",
+                                                activeFlowStep === i ? "text-white" : "text-white/40 group-hover:text-white/60"
+                                            )}>
+                                                {step.step}
+                                            </h4>
+                                            <AnimatePresence>
+                                                {activeFlowStep === i && (
+                                                    <motion.p
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: "auto", opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        className="text-sm text-white/30 leading-relaxed font-light overflow-hidden"
+                                                    >
+                                                        {step.description}
+                                                    </motion.p>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
                                     </motion.div>
                                 ))}
                             </div>
                         </section>
-
-                        {/* COMPACT INTERACTIVE FLOWCHART */}
-                        {flowchart.length > 0 && (
-                            <section className="space-y-8">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <Workflow className="w-3.5 h-3.5 text-green-400/40" />
-                                        <span className="font-black text-[9px] uppercase tracking-[0.4em] text-white/10">Sequential Delta</span>
-                                    </div>
-                                </div>
-
-                                <div className="relative space-y-4">
-                                    {/* Small Connector Line */}
-                                    <div className="absolute left-[21px] top-6 bottom-6 w-px bg-gradient-to-b from-primary/30 via-white/5 to-transparent z-0" />
-
-                                    {flowchart.map((step: any, i: number) => (
-                                        <motion.div
-                                            key={i}
-                                            onClick={() => setActiveFlowStep(i)}
-                                            className={cn(
-                                                "relative flex gap-6 items-start cursor-pointer group p-4 rounded-[1.5rem] transition-all",
-                                                activeFlowStep === i
-                                                    ? "bg-white/[0.02] border border-white/5 shadow-md"
-                                                    : "bg-transparent border border-transparent hover:bg-white/[0.01]"
-                                            )}
-                                        >
-                                            <div className="relative z-10">
-                                                <div className={cn(
-                                                    "w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-300",
-                                                    activeFlowStep === i
-                                                        ? "bg-primary/20 border-primary shadow-[0_0_10px_rgba(34,211,238,0.3)]"
-                                                        : "bg-black border-white/5 group-hover:border-white/20"
-                                                )}>
-                                                    <span className={cn(
-                                                        "text-[9px] font-black font-mono",
-                                                        activeFlowStep === i ? "text-primary" : "text-white/20"
-                                                    )}>
-                                                        {String(i + 1).padStart(2, '0')}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex flex-col gap-1 pt-0.5">
-                                                <h4 className={cn(
-                                                    "text-lg font-bold tracking-tight transition-colors",
-                                                    activeFlowStep === i ? "text-white" : "text-white/40 group-hover:text-white/60"
-                                                )}>
-                                                    {step.step}
-                                                </h4>
-                                                <AnimatePresence>
-                                                    {activeFlowStep === i && (
-                                                        <motion.p
-                                                            initial={{ height: 0, opacity: 0 }}
-                                                            animate={{ height: "auto", opacity: 1 }}
-                                                            exit={{ height: 0, opacity: 0 }}
-                                                            className="text-sm text-white/30 leading-relaxed font-light overflow-hidden"
-                                                        >
-                                                            {step.description}
-                                                        </motion.p>
-                                                    )}
-                                                </AnimatePresence>
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                </div>
-                            </section>
-                        )}
-                    </div>
+                    )}
+                </div>
 
 
                 {/* Quiz */}
